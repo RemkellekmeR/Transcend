@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcend - Voice Clone Singing</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">&#9835;</span>
+                <h1>Transcend</h1>
+            </div>
+            <p class="tagline">Clone your voice. Sing on your songs.</p>
+        </header>
+
+        <!-- Progress Steps -->
+        <nav class="steps-nav">
+            <button class="step-btn active" data-step="1">
+                <span class="step-num">1</span>
+                <span class="step-label">Record Voice</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="step-btn" data-step="2">
+                <span class="step-num">2</span>
+                <span class="step-label">Train Model</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="step-btn" data-step="3">
+                <span class="step-num">3</span>
+                <span class="step-label">Upload Song</span>
+            </button>
+            <div class="step-connector"></div>
+            <button class="step-btn" data-step="4">
+                <span class="step-num">4</span>
+                <span class="step-label">Convert & Export</span>
+            </button>
+        </nav>
+
+        <!-- Step 1: Record Voice -->
+        <section class="step-panel active" id="step-1">
+            <div class="panel-content">
+                <h2>Record Your Voice</h2>
+                <p class="instruction">Record yourself speaking or singing naturally. The more you record, the better the clone will sound. Aim for at least 30 seconds.</p>
+
+                <div class="profile-name-input">
+                    <label for="profileName">Voice Profile Name</label>
+                    <input type="text" id="profileName" placeholder="e.g., My Voice" value="my_voice">
+                </div>
+
+                <div class="recorder-container">
+                    <div class="waveform-display" id="waveformDisplay">
+                        <canvas id="waveformCanvas"></canvas>
+                        <div class="recording-time" id="recordingTime">0:00</div>
+                    </div>
+
+                    <div class="recorder-controls">
+                        <button class="btn btn-record" id="btnRecord">
+                            <span class="record-dot"></span>
+                            Record
+                        </button>
+                        <button class="btn btn-stop" id="btnStop" disabled>
+                            Stop
+                        </button>
+                    </div>
+
+                    <div class="upload-alt">
+                        <span>or</span>
+                        <label class="btn btn-outline upload-label">
+                            Upload Audio File
+                            <input type="file" id="voiceFileUpload" accept="audio/*" hidden>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="recordings-list" id="recordingsList">
+                    <h3>Your Recordings</h3>
+                    <div class="recordings-items" id="recordingsItems">
+                        <p class="empty-state">No recordings yet. Hit Record or upload a file.</p>
+                    </div>
+                    <div class="total-duration">
+                        Total: <span id="totalDuration">0s</span>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-primary btn-next" id="btnToStep2" disabled>
+                        Next: Train Voice Model
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 2: Train Model -->
+        <section class="step-panel" id="step-2">
+            <div class="panel-content">
+                <h2>Train Your Voice Model</h2>
+                <p class="instruction">The app will analyze your recordings and learn your unique vocal characteristics -- pitch, timbre, tone, and style.</p>
+
+                <div class="training-info">
+                    <div class="info-card">
+                        <div class="info-label">Recordings</div>
+                        <div class="info-value" id="trainRecCount">0</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Total Audio</div>
+                        <div class="info-value" id="trainDuration">0s</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Profile</div>
+                        <div class="info-value" id="trainProfileName">-</div>
+                    </div>
+                </div>
+
+                <div class="training-progress" id="trainingProgress" style="display:none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Analyzing voice characteristics...</p>
+                </div>
+
+                <div class="training-result" id="trainingResult" style="display:none;">
+                    <div class="result-card success">
+                        <h3>Voice Model Created</h3>
+                        <div class="result-details">
+                            <div class="detail-row">
+                                <span>Average Pitch:</span>
+                                <span id="resultPitch">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Pitch Range:</span>
+                                <span id="resultRange">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Engine:</span>
+                                <span id="resultEngine">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-outline" id="btnBackTo1">Back</button>
+                    <button class="btn btn-primary" id="btnTrain">
+                        Train Voice Model
+                    </button>
+                    <button class="btn btn-primary btn-next" id="btnToStep3" disabled>
+                        Next: Upload Song
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 3: Upload Song -->
+        <section class="step-panel" id="step-3">
+            <div class="panel-content">
+                <h2>Upload Your Song</h2>
+                <p class="instruction">Upload the song you wrote. The app will separate the vocals from the instrumentals, then re-sing the vocals in your cloned voice.</p>
+
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">&#9835;</div>
+                    <h3>Drop your song here</h3>
+                    <p>or click to browse</p>
+                    <p class="upload-formats">WAV, MP3, FLAC, OGG, M4A</p>
+                    <input type="file" id="songFileUpload" accept="audio/*" hidden>
+                </div>
+
+                <div class="song-info" id="songInfo" style="display:none;">
+                    <div class="song-card">
+                        <div class="song-name" id="songName">-</div>
+                        <div class="song-duration" id="songDuration">-</div>
+                        <audio id="songPreview" controls></audio>
+                    </div>
+
+                    <div class="separation-section">
+                        <h3>Vocal Separation</h3>
+                        <p>Split the song into vocals and instrumental tracks.</p>
+                        <button class="btn btn-primary" id="btnSeparate">
+                            Separate Vocals
+                        </button>
+                        <div class="separation-progress" id="separationProgress" style="display:none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill indeterminate"></div>
+                            </div>
+                            <p>Separating vocals from instrumentals...</p>
+                        </div>
+                    </div>
+
+                    <div class="separated-tracks" id="separatedTracks" style="display:none;">
+                        <div class="track-card">
+                            <h4>Vocals</h4>
+                            <audio id="vocalsPreview" controls></audio>
+                        </div>
+                        <div class="track-card">
+                            <h4>Instrumental</h4>
+                            <audio id="instrumentalPreview" controls></audio>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-outline" id="btnBackTo2">Back</button>
+                    <button class="btn btn-primary btn-next" id="btnToStep4" disabled>
+                        Next: Convert Voice
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 4: Convert & Export -->
+        <section class="step-panel" id="step-4">
+            <div class="panel-content">
+                <h2>Convert & Export</h2>
+                <p class="instruction">Apply your cloned voice to the song. Adjust settings and export the final track.</p>
+
+                <div class="convert-settings">
+                    <div class="setting-group">
+                        <label for="pitchShift">Pitch Shift (semitones)</label>
+                        <div class="range-with-value">
+                            <input type="range" id="pitchShift" min="-12" max="12" value="0" step="1">
+                            <span class="range-value" id="pitchShiftValue">0</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <label for="vocalVolume">Vocal Volume</label>
+                        <div class="range-with-value">
+                            <input type="range" id="vocalVolume" min="0" max="2" value="1" step="0.1">
+                            <span class="range-value" id="vocalVolumeValue">1.0</span>
+                        </div>
+                    </div>
+                    <div class="setting-group">
+                        <label for="instrVolume">Instrumental Volume</label>
+                        <div class="range-with-value">
+                            <input type="range" id="instrVolume" min="0" max="2" value="0.8" step="0.1">
+                            <span class="range-value" id="instrVolumeValue">0.8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="convert-actions">
+                    <button class="btn btn-primary btn-large" id="btnConvert">
+                        Clone Voice & Generate Song
+                    </button>
+                </div>
+
+                <div class="convert-progress" id="convertProgress" style="display:none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill indeterminate"></div>
+                    </div>
+                    <p class="progress-text" id="convertProgressText">Converting voice...</p>
+                </div>
+
+                <div class="output-section" id="outputSection" style="display:none;">
+                    <div class="output-card">
+                        <h3>Your Song is Ready</h3>
+                        <audio id="outputPreview" controls></audio>
+                        <div class="output-actions">
+                            <button class="btn btn-primary" id="btnDownload">
+                                Download WAV
+                            </button>
+                            <button class="btn btn-outline" id="btnConvertAgain">
+                                Convert Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn btn-outline" id="btnBackTo3">Back</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <span class="status-engine" id="statusEngine">Engine: loading...</span>
+            <span class="status-separator" id="statusSeparator">Separator: loading...</span>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
