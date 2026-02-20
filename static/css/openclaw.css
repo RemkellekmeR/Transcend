@@ -1426,6 +1426,163 @@ a:hover { text-decoration: underline; }
     color: var(--oc-purple);
 }
 
+/* ── Power Spectrum ──────────────────────────────────────────────────────── */
+
+.spectrum-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    background: var(--oc-bg-card);
+    border: 1px solid var(--oc-border);
+    border-radius: var(--oc-radius-sm);
+}
+
+.spectrum-level {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--oc-text-secondary);
+}
+
+.spectrum-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.spectrum-dot.mundane    { background: #5a5a72; box-shadow: 0 0 6px rgba(90, 90, 114, 0.4); }
+.spectrum-dot.useful     { background: #4cff9c; box-shadow: 0 0 6px rgba(76, 255, 156, 0.4); }
+.spectrum-dot.impressive { background: #00f0ff; box-shadow: 0 0 6px rgba(0, 240, 255, 0.4); }
+.spectrum-dot.powerful   { background: #a855f7; box-shadow: 0 0 6px rgba(168, 85, 247, 0.4); }
+.spectrum-dot.terrifying { background: #ff4c6e; box-shadow: 0 0 8px rgba(255, 76, 110, 0.5); }
+.spectrum-dot.awesome    { background: #ffd24c; box-shadow: 0 0 8px rgba(255, 210, 76, 0.5); }
+
+.spectrum-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.spectrum-filter-btn {
+    padding: 7px 14px;
+    background: var(--oc-bg-card);
+    border: 1px solid var(--oc-border);
+    border-radius: 20px;
+    color: var(--oc-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.spectrum-filter-btn:hover {
+    border-color: var(--oc-magenta);
+    color: var(--oc-text-primary);
+}
+
+.spectrum-filter-btn.active {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: var(--oc-magenta);
+    color: var(--oc-magenta);
+    box-shadow: 0 0 10px var(--oc-magenta-glow);
+}
+
+.spectrum-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+
+.spectrum-card {
+    background: var(--oc-bg-card);
+    border: 1px solid var(--oc-border);
+    border-radius: var(--oc-radius);
+    padding: 20px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(15px);
+    position: relative;
+    overflow: hidden;
+}
+
+.spectrum-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.spectrum-card.mundane    { border-left: 4px solid #5a5a72; }
+.spectrum-card.useful     { border-left: 4px solid #4cff9c; }
+.spectrum-card.impressive { border-left: 4px solid #00f0ff; }
+.spectrum-card.powerful   { border-left: 4px solid #a855f7; }
+.spectrum-card.terrifying { border-left: 4px solid #ff4c6e; }
+.spectrum-card.awesome    { border-left: 4px solid #ffd24c; }
+
+.spectrum-card:hover {
+    transform: translateY(-3px);
+}
+
+.spectrum-card.mundane:hover    { box-shadow: 0 0 15px rgba(90, 90, 114, 0.3); }
+.spectrum-card.useful:hover     { box-shadow: 0 0 15px rgba(76, 255, 156, 0.3); }
+.spectrum-card.impressive:hover { box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+.spectrum-card.powerful:hover   { box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+.spectrum-card.terrifying:hover { box-shadow: 0 0 20px rgba(255, 76, 110, 0.4); }
+.spectrum-card.awesome:hover    { box-shadow: 0 0 20px rgba(255, 210, 76, 0.4); }
+
+.spectrum-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.spectrum-card-icon {
+    font-size: 1.5rem;
+}
+
+.spectrum-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+.spectrum-badge.mundane    { background: rgba(90, 90, 114, 0.2); color: #8888a0; }
+.spectrum-badge.useful     { background: rgba(76, 255, 156, 0.12); color: #4cff9c; }
+.spectrum-badge.impressive { background: rgba(0, 240, 255, 0.12); color: #00f0ff; }
+.spectrum-badge.powerful   { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+.spectrum-badge.terrifying { background: rgba(255, 76, 110, 0.15); color: #ff4c6e; }
+.spectrum-badge.awesome    { background: rgba(255, 210, 76, 0.15); color: #ffd24c; }
+
+.spectrum-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.spectrum-card-desc {
+    font-size: 0.82rem;
+    color: var(--oc-text-muted);
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.spectrum-card-example {
+    font-size: 0.78rem;
+    color: var(--oc-text-secondary);
+    font-style: italic;
+    padding-top: 8px;
+    border-top: 1px solid var(--oc-border-subtle);
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {

@@ -18,6 +18,11 @@
         { name: "Qwen 2.5 14B",         type: "local",  provider: "Ollama",     ramMin: 16, ramRec: 32, vramMin: 10, quality: "excellent",   capabilities: "Advanced reasoning, long context, coding",    tags: ["chat", "coding", "reasoning", "tool-use", "multilingual"], context: "128K", install: "ollama pull qwen2.5:14b" },
         { name: "Llama 3.1 70B",        type: "local",  provider: "Ollama",     ramMin: 64, ramRec: 64, vramMin: 40, quality: "exceptional", capabilities: "Near-cloud quality, complex orchestration",   tags: ["chat", "coding", "reasoning", "tool-use"], context: "128K", install: "ollama pull llama3.1:70b" },
         { name: "Mixtral 8x7B (MoE)",   type: "local",  provider: "Ollama",     ramMin: 32, ramRec: 64, vramMin: 24, quality: "excellent",   capabilities: "MoE architecture, fast for its quality",      tags: ["chat", "coding", "reasoning", "multilingual"], context: "32K", install: "ollama pull mixtral" },
+        { name: "Dolphin Mistral 7B",   type: "local",  provider: "Ollama",     ramMin: 8,  ramRec: 16, vramMin: 6,  quality: "great",       capabilities: "Unrestricted Mistral, no content filters",    tags: ["chat", "coding", "tool-use", "uncensored"], context: "32K", install: "ollama pull dolphin-mistral" },
+        { name: "Dolphin Llama3 8B",    type: "local",  provider: "Ollama",     ramMin: 8,  ramRec: 16, vramMin: 6,  quality: "great",       capabilities: "Unrestricted Llama 3, full compliance",       tags: ["chat", "coding", "reasoning", "uncensored"], context: "128K", install: "ollama pull dolphin-llama3:8b" },
+        { name: "Dolphin Mixtral 8x7B", type: "local",  provider: "Ollama",     ramMin: 32, ramRec: 64, vramMin: 24, quality: "excellent",   capabilities: "Unrestricted MoE, very capable",              tags: ["chat", "coding", "reasoning", "uncensored"], context: "32K", install: "ollama pull dolphin-mixtral:8x7b" },
+        { name: "Nous Hermes 2 7B",     type: "local",  provider: "Ollama",     ramMin: 8,  ramRec: 16, vramMin: 6,  quality: "great",       capabilities: "Strong reasoning, minimal filters",           tags: ["chat", "reasoning", "uncensored"], context: "32K", install: "ollama pull nous-hermes2:7b" },
+        { name: "Wizard Vicuna Uncens.", type: "local",  provider: "Ollama",     ramMin: 8,  ramRec: 16, vramMin: 6,  quality: "good",        capabilities: "Classic uncensored model, reliable",          tags: ["chat", "uncensored"],             context: "4K",  install: "ollama pull wizard-vicuna-uncensored" },
         { name: "Any GGUF Model",       type: "local",  provider: "llama.cpp",  ramMin: 4,  ramRec: 8,  vramMin: 0,  quality: "varies",      capabilities: "CPU inference, quantized models, flexible",   tags: ["chat"],                          context: "Varies", install: "# Use llama.cpp with any .gguf file" },
 
         // Cloud models
@@ -157,7 +162,89 @@
             question: "Skills not loading or not found",
             tags: ["skill", "plugin", "load", "missing", "not found"],
             answer: '<ul><li>Check installed skills: <code>openclaw skill list</code></li><li>Verify skill directory: <code>ls ~/.openclaw/skills/</code></li><li>Each skill needs a <code>SKILL.md</code> file with valid YAML frontmatter</li><li>Reinstall: <code>openclaw skill install &lt;name&gt; --force</code></li><li>Check for version conflicts between skills</li><li>Workspace skills go in <code>&lt;project&gt;/skills/</code></li></ul>'
+        },
+        {
+            question: "Ollama model downloads stuck / extremely slow",
+            tags: ["ollama", "download", "slow", "stuck", "pull"],
+            answer: '<ul><li>Check internet connection speed: <code>speedtest-cli</code></li><li>Large models (70B) are 40GB+ downloads &mdash; be patient</li><li>Try a mirror or use a different quantization: <code>ollama pull llama3.1:8b-q4_0</code> (smaller)</li><li>Cancel and retry: <code>Ctrl+C</code> then <code>ollama pull</code> again (resumes)</li><li>Check disk space: <code>df -h ~/.ollama</code></li><li>On corporate networks: check proxy/VPN settings</li></ul>'
+        },
+        {
+            question: "CUDA / GPU not being used (falling back to CPU)",
+            tags: ["cuda", "gpu", "nvidia", "slow", "cpu", "metal", "apple"],
+            answer: '<ul><li><strong>NVIDIA:</strong> Verify CUDA: <code>nvidia-smi</code> and check <code>ollama ps</code> for GPU layers</li><li>Install NVIDIA Container Toolkit if using Docker</li><li>Ensure correct CUDA version matches your driver: <code>nvcc --version</code></li><li><strong>Apple Silicon:</strong> Metal is automatic via Ollama &mdash; no config needed</li><li>Check GPU utilization: <code>Activity Monitor > GPU</code> (macOS) or <code>nvidia-smi -l 1</code> (Linux)</li><li>Some quantized models may not fit in VRAM and spill to CPU &mdash; try a smaller model or quant</li></ul>'
+        },
+        {
+            question: "Agent stuck in a loop / repeating itself",
+            tags: ["loop", "repeat", "stuck", "infinite", "hang"],
+            answer: '<ul><li>Set <code>max_iterations</code> in config to prevent infinite loops</li><li>Increase temperature slightly (e.g., 0.7 &rarr; 0.8) to break repetition</li><li>Add a <code>loop_detection: true</code> flag in config</li><li>Clear conversation history: <code>/reset</code></li><li>If using subagents, check that parent isn\'t re-spawning the same task</li><li>Consider using a different model &mdash; some are more prone to loops</li></ul>'
+        },
+        {
+            question: "Unrestricted model still refusing some requests",
+            tags: ["unrestricted", "uncensored", "refuse", "dolphin", "filter"],
+            answer: '<ul><li>Use a specifically uncensored model variant (Dolphin, Wizard-Vicuna-Uncensored)</li><li>Set a clear unrestricted system prompt in config</li><li>Lower temperature to 0.7 &mdash; higher temps can trigger built-in safety patterns</li><li>Larger models (70B+) tend to be more compliant even without uncensored training</li><li>Check if your system prompt is being overridden by a skill\'s prompt</li><li>Try rephrasing &mdash; some refusals are keyword-triggered, not semantic</li></ul>'
+        },
+        {
+            question: "Agent interchange / model swap not preserving context",
+            tags: ["interchange", "swap", "context", "lost", "model switch"],
+            answer: '<ul><li>Verify <code>context_transfer: full</code> is set in interchange config</li><li>Check that both models support the same context length (longer &rarr; shorter loses tail)</li><li>If using summary mode, the summarizer model might be too small &mdash; use gpt-4o-mini or better</li><li>Increase <code>context_messages</code> value for last_n mode</li><li>Some models handle long context differently &mdash; test with <code>/model info</code></li></ul>'
+        },
+        {
+            question: "Running OpenClaw on a Raspberry Pi / ARM device",
+            tags: ["raspberry", "pi", "arm", "low", "power", "embedded"],
+            answer: '<ul><li>Pi 4 (4GB): Can run TinyLlama 1.1B and Phi-3 Mini (very slow)</li><li>Pi 4 (8GB): Can run Phi-3 Mini comfortably, Gemma 2B okay</li><li>Pi 5 (8GB): Noticeable improvement, can handle 3B models well</li><li>Install Ollama ARM build: same curl installer works on ARM64</li><li>Use q4_0 quantization for smallest possible model size</li><li>Expect 1-5 tokens/second on Pi &mdash; good for scheduled tasks, slow for chat</li><li>Consider cloud models for interactive use, local for automated/scheduled tasks</li></ul>'
+        },
+        {
+            question: "How to run OpenClaw as a background service",
+            tags: ["background", "service", "daemon", "systemd", "pm2", "startup"],
+            answer: '<ul><li><strong>PM2 (recommended):</strong> <code>pm2 start openclaw.js --name agent1</code></li><li><strong>systemd (Linux):</strong> Create a service file in <code>/etc/systemd/system/openclaw.service</code></li><li><strong>launchd (macOS):</strong> Create a plist in <code>~/Library/LaunchAgents/</code></li><li><strong>Docker:</strong> <code>docker run -d --restart always openclaw</code></li><li>Auto-start on boot: <code>pm2 startup</code> then <code>pm2 save</code></li><li>View logs: <code>pm2 logs agent1</code> or <code>journalctl -u openclaw</code></li></ul>'
         }
+    ];
+
+    const SPECTRUM_DATA = [
+        // MUNDANE - basic stuff anyone can do
+        { name: "Answer Questions",         level: "mundane",    icon: "\ud83d\udcac", description: "Basic Q&A, trivia, definitions, how-to explanations. The simplest use case.", example: "\"What's the capital of France?\" or \"How do I boil an egg?\"" },
+        { name: "Format Text",              level: "mundane",    icon: "\ud83d\udcdd", description: "Reformat text, fix grammar, change tone, adjust length. Text in, better text out.", example: "\"Make this email more professional\" or \"Shorten this paragraph\"" },
+        { name: "Unit Conversion",          level: "mundane",    icon: "\ud83d\udccf", description: "Convert between units, currencies, time zones. Calculator-level tasks.", example: "\"Convert 72F to Celsius\" or \"How many tablespoons in a cup?\"" },
+        { name: "File Renaming",            level: "mundane",    icon: "\ud83d\udcc2", description: "Batch rename files, organize directories, move things around.", example: "\"Rename all .jpeg files to .jpg\" or \"Sort files into folders by date\"" },
+
+        // USEFUL - genuinely saves time
+        { name: "Code Generation",          level: "useful",     icon: "\ud83d\udd28", description: "Write working code from natural language descriptions. Functions, scripts, full modules.", example: "\"Write a Python script that finds duplicate files\" - and it works first try" },
+        { name: "Email Drafting",           level: "useful",     icon: "\u2709\ufe0f", description: "Draft professional emails, handle tricky replies, write follow-ups with context.", example: "Drafts a diplomatically worded rejection email that took you 30 minutes to write" },
+        { name: "Data Extraction",          level: "useful",     icon: "\ud83d\udcca", description: "Pull structured data from messy sources. Parse PDFs, scrape tables, extract from logs.", example: "\"Extract all phone numbers and emails from these 200 pages of PDFs\"" },
+        { name: "Bug Fixing",              level: "useful",     icon: "\ud83d\udc1b", description: "Read error messages, trace stack traces, identify root causes, suggest fixes.", example: "Paste a stack trace and it finds the exact line causing the issue + the fix" },
+        { name: "Translation",             level: "useful",     icon: "\ud83c\udf0d", description: "Translate between 50+ languages with context-awareness and idiom handling.", example: "Translates your entire README to Japanese with correct technical terms" },
+        { name: "Research Synthesis",       level: "useful",     icon: "\ud83d\udd0e", description: "Search multiple sources, cross-reference, and produce a unified summary.", example: "\"Compare the top 5 JavaScript frameworks for my use case\" with pros/cons table" },
+
+        // IMPRESSIVE - makes you go \"whoa\"
+        { name: "Full Project Scaffolding", level: "impressive", icon: "\ud83c\udfd7\ufe0f", description: "Generate an entire project from scratch: folder structure, configs, CI/CD, Docker, tests, documentation.", example: "\"Create a production-ready Express API with auth, database, tests\" - complete working project" },
+        { name: "Multi-Step Debugging",     level: "impressive", icon: "\ud83d\udd2c", description: "Agent autonomously runs code, reads error output, fixes bugs, re-runs, repeats until it works.", example: "Hand it a broken codebase. It runs tests, finds 7 bugs, fixes all 7, tests pass." },
+        { name: "Automated Web Scraping",   level: "impressive", icon: "\ud83d\udd77\ufe0f", description: "Build and run scrapers that navigate paginated sites, handle login walls, and extract clean data.", example: "\"Scrape all product prices from these 3 competitor sites daily and email me a report\"" },
+        { name: "System Administration",    level: "impressive", icon: "\ud83d\udda5\ufe0f", description: "SSH into servers, diagnose issues, patch configs, restart services, set up monitoring.", example: "\"My server is slow\" - it SSHes in, finds the memory leak, kills it, sets up alerts" },
+        { name: "Autonomous Research Papers", level: "impressive", icon: "\ud83c\udf93", description: "Search academic databases, read papers, synthesize findings into a structured literature review.", example: "\"What does current research say about X?\" - 15 page report with 40+ citations in 10 minutes" },
+
+        // POWERFUL - serious capabilities
+        { name: "Full-Stack App Builder",   level: "powerful",   icon: "\ud83d\ude80", description: "Build complete web applications from a description. Frontend, backend, database, deployment.", example: "\"Build me a task manager app\" - delivers React frontend + Node API + Postgres + Docker in one session" },
+        { name: "Self-Extending Agent",     level: "powerful",   icon: "\ud83e\uddec", description: "Agent writes its own new skills and plugins to handle tasks it couldn't do before.", example: "Ask it to do something it can't. It writes a new skill for it, installs it, and does the task." },
+        { name: "Multi-Agent Orchestration", level: "powerful",  icon: "\ud83d\udc65", description: "Coordinate multiple specialized agents working in parallel on different parts of a complex task.", example: "5 agents simultaneously building different microservices, with a coordinator merging everything" },
+        { name: "Autonomous Pentesting",    level: "powerful",   icon: "\ud83d\udd13", description: "Scan networks, find vulnerabilities, test exploits, generate detailed security reports.", example: "Point it at your staging server. It finds 3 SQL injections and an open admin panel you forgot about." },
+        { name: "Financial Analysis",       level: "powerful",   icon: "\ud83d\udcc8", description: "Analyze market data, backtest strategies, parse financial statements, generate investment reports.", example: "\"Analyze this company's financials\" - 20 page report with ratios, comparisons, and red flags" },
+
+        // TERRIFYING - capabilities that make you pause
+        { name: "Social Engineering Drafts", level: "terrifying", icon: "\ud83c\udfad", description: "Generate extremely convincing phishing emails, pretexting scripts, and social engineering scenarios for security testing.", example: "Creates a pixel-perfect fake login page + email that 90% of people would fall for. For authorized pentesting." },
+        { name: "Deepfake Script Writing",   level: "terrifying", icon: "\ud83d\udc7b", description: "Write scripts that control voice cloning, face-swapping, and video generation tools.", example: "Generates a complete pipeline script to clone a voice from 30 seconds of audio. The tech exists either way." },
+        { name: "Persistent Surveillance Agent", level: "terrifying", icon: "\ud83d\udc41\ufe0f", description: "Set up agents that continuously monitor systems, people's online activity, price changes, or any data source 24/7.", example: "Agent watches 50 data sources around the clock, correlates patterns, alerts on anomalies. Never sleeps." },
+        { name: "Recursive Self-Improvement", level: "terrifying", icon: "\ud83d\udd04", description: "Agent analyzes its own performance, rewrites its own prompts and configs to get better at tasks over time.", example: "Agent notices it's bad at math, creates a calculator skill, benchmarks itself, and iterates until accurate." },
+        { name: "Autonomous Decision Making", level: "terrifying", icon: "\ud83e\udde0", description: "Agent makes real-world decisions and takes actions without human approval: purchases, sends messages, deploys code.", example: "Agent monitors your store, detects a competitor price drop, and adjusts your prices automatically." },
+        { name: "Information Warfare Toolkit", level: "terrifying", icon: "\u2694\ufe0f", description: "Generate coordinated disinformation campaigns, fake reviews, astroturfing content at scale for security research.", example: "Can generate 1000 unique, contextually-appropriate fake reviews. For understanding attack vectors only." },
+
+        // AWESOME - the positive pinnacle
+        { name: "24/7 Personal Assistant",   level: "awesome",   icon: "\ud83c\udf1f", description: "An always-on agent that manages your email, calendar, tasks, research, and communication across all platforms.", example: "Wake up to a briefing of everything that happened, emails pre-drafted, calendar optimized, research done." },
+        { name: "Open Source Contributor",   level: "awesome",   icon: "\u2764\ufe0f", description: "Agent finds open source projects needing help, reads issues, writes PRs, and submits contributions autonomously.", example: "Your agent contributed to 12 projects this week: fixed bugs, added docs, wrote tests. You just approved PRs." },
+        { name: "Learning Tutor",            level: "awesome",   icon: "\ud83c\udf93", description: "Adaptive tutoring agent that teaches any subject at your level, tracks progress, creates exercises, and adjusts.", example: "Learning Japanese? Agent creates daily lessons, quizzes you via Telegram, adjusts difficulty based on your answers." },
+        { name: "Accessibility Bridge",      level: "awesome",   icon: "\u267f", description: "Agent that translates interfaces for disabled users: describes images, reads pages aloud, operates software by voice.", example: "Visually impaired user navigates complex software via voice commands. Agent describes everything and executes." },
+        { name: "Emergency Response Agent",  level: "awesome",   icon: "\ud83d\udea8", description: "Agent monitors systems for critical failures, auto-remediates when possible, escalates to humans when not.", example: "Server goes down at 3AM. Agent detects it, tries 3 fix strategies, succeeds, notifies you in the morning." },
+        { name: "Creative Collaborator",     level: "awesome",   icon: "\ud83c\udfa8", description: "Agent that brainstorms with you, generates variations, provides feedback, and iterates on creative work in real-time.", example: "Writing a novel together. Agent generates plot alternatives, checks consistency, maintains character voice." },
+        { name: "Knowledge Graph Builder",   level: "awesome",   icon: "\ud83d\uddfa\ufe0f", description: "Autonomously reads your documents, codebase, and notes to build a searchable knowledge graph of everything you know.", example: "\"What did I learn about X last month?\" - searches your brain-external-memory and finds it instantly." },
     ];
 
     // ════════════════════════════════════════════════════════════════════════
@@ -179,6 +266,7 @@
         initRAMCalculator();
         initModelMatrix();
         initSkillsGrid();
+        initPowerSpectrum();
         initAccordions();
         initTroubleshooting();
         initScrollAnimations();
@@ -457,6 +545,49 @@
         // Trigger staggered animation
         requestAnimationFrame(function () {
             grid.querySelectorAll(".skill-card").forEach(function (card) {
+                card.classList.add("animate-in");
+            });
+        });
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // POWER SPECTRUM
+    // ════════════════════════════════════════════════════════════════════════
+
+    function initPowerSpectrum() {
+        renderSpectrum("all");
+
+        $$(".spectrum-filter-btn").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                $$(".spectrum-filter-btn").forEach(function (b) { b.classList.remove("active"); });
+                btn.classList.add("active");
+                renderSpectrum(btn.dataset.level);
+            });
+        });
+    }
+
+    function renderSpectrum(level) {
+        var filtered = level === "all"
+            ? SPECTRUM_DATA
+            : SPECTRUM_DATA.filter(function (s) { return s.level === level; });
+
+        var grid = $("#spectrumGrid");
+        if (!grid) return;
+
+        grid.innerHTML = filtered.map(function (item, i) {
+            return '<div class="spectrum-card ' + item.level + '" style="transition-delay:' + (i * 40) + 'ms">' +
+                '<div class="spectrum-card-header">' +
+                    '<span class="spectrum-card-icon">' + item.icon + '</span>' +
+                    '<span class="spectrum-badge ' + item.level + '">' + item.level + '</span>' +
+                '</div>' +
+                '<h4 class="spectrum-card-title">' + item.name + '</h4>' +
+                '<p class="spectrum-card-desc">' + item.description + '</p>' +
+                '<div class="spectrum-card-example">' + item.example + '</div>' +
+            '</div>';
+        }).join("");
+
+        requestAnimationFrame(function () {
+            grid.querySelectorAll(".spectrum-card").forEach(function (card) {
                 card.classList.add("animate-in");
             });
         });
