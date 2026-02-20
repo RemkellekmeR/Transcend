@@ -178,8 +178,8 @@ MODEL_PROVIDER=ollama
 MODEL_NAME=llama3.1:8b
 
 # Cloud provider keys (use one or more)
-# OPENAI_API_KEY=sk-...
-# ANTHROPIC_API_KEY=sk-ant-...
+# OPENAI_API_KEY=sk-proj-...
+# ANTHROPIC_API_KEY=sk-ant-api03-...
 # GOOGLE_AI_KEY=AI...
 
 # Telegram (optional)
@@ -743,7 +743,7 @@ agents:
     role: "Handle coding tasks"
     triggers: ["code", "debug", "fix", "script"]
   researcher:
-    model: claude-sonnet
+    model: claude-sonnet-4-5
     role: "Research and analysis"
     triggers: ["search", "find", "explain"]
   creative:
@@ -825,7 +825,7 @@ memory:
                     <code># Switch models on the fly in Telegram:
 /model dolphin-mistral          # Switch to local unrestricted
 /model gpt-4o                   # Switch to cloud GPT-4o
-/model claude-sonnet             # Switch to Claude
+/model claude-sonnet-4-5         # Switch to Claude
 /model deepseek-coder-v2        # Switch to coding specialist
 /model llama3.1:70b             # Switch to big local model
 
@@ -874,7 +874,7 @@ personas:
     trigger: "/unfiltered"
     name: "Dolphin"
   analyst:
-    model: claude-sonnet
+    model: claude-sonnet-4-5
     system_prompt: "You are a data analyst and researcher"
     trigger: "/analyst"
     name: "Analyst"
@@ -1168,7 +1168,7 @@ subagents:
   models:
     default: llama3.1:8b
     coding: deepseek-coder-v2
-    research: claude-haiku
+    research: claude-haiku-4-5
 
 # Telegram command to spawn manually:
 # /subagent coder "Write unit tests for the auth module"
