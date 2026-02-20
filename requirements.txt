@@ -4,3 +4,4 @@ librosa>=0.10
 soundfile>=0.12
 scipy>=1.11
 pydub>=0.25
+gunicorn>=21.2
