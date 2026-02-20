@@ -38,6 +38,11 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/openclaw-guide")
+def openclaw_guide():
+    return render_template("openclaw_guide.html")
+
+
 # ─── Voice Recording & Profile API ──────────────────────────────────────────
 
 @app.route("/api/record", methods=["POST"])
