@@ -35,12 +35,19 @@ def allowed_file(filename):
 
 @app.route("/")
 def index():
+    return render_template("openclaw_guide.html")
+
+
+@app.route("/voice-clone")
+def voice_clone():
     return render_template("index.html")
 
 
 @app.route("/openclaw-guide")
 def openclaw_guide():
-    return render_template("openclaw_guide.html")
+    """Legacy route - redirect to homepage."""
+    from flask import redirect
+    return redirect("/", code=301)
 
 
 # ─── Voice Recording & Profile API ──────────────────────────────────────────
